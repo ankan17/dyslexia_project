@@ -1,0 +1,15 @@
+web:
+  build: ./backend
+  command: bash -c "python3 /src/manage.py runserver"
+  ports:
+    - "5000:5000"
+  volumes:
+    - ./backend:/src
+  links:
+    - db
+db:
+  image: mongo:3.0.2
+  volumes:
+    - ./db:/data/db
+  ports:
+    - "27017:27017"
