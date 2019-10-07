@@ -3,7 +3,7 @@ FROM ubuntu:latest
 RUN apt-get update \
   && apt-get install -y gcc autoconf libtool swig python3-dev \
   python3-pip python3-pyaudio git bison build-essential \
-  libasound2-dev libpulse-dev pulseaudio \
+  libasound2-dev libpulse-dev pulseaudio tar \
   && apt-get clean \
   && rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*
 
@@ -16,7 +16,7 @@ RUN apt-get update \
 
 # ENV LD_LIBRARY_PATH="/usr/local/lib"
 # ENV PKG_CONFIG_PATH="/usr/local/lib/pkgconfig"
-
+#
 # RUN git clone https://github.com/cmusphinx/pocketsphinx.git --progress
 # RUN cd pocketsphinx \
 #   && ./autogen.sh \
