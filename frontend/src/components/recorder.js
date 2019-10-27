@@ -31,9 +31,10 @@ export default class RecordingAPI extends React.Component {
     this.mediaRecorder.stop();
 
     const blob = new Blob(this.recordedChunks, {'type' : 'audio/wav'});
-
     const player = this.refs['player_' + this.props.id];
-    player.src = URL.createObjectURL(blob);
+    var blobUrl = URL.createObjectURL(blob);
+
+    player.src = blobUrl;
 
     this.props.onDataSubmit(blob);
 

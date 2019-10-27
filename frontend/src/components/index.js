@@ -3,7 +3,6 @@ import axios from "axios";
 import FormData from "form-data";
 
 import RecordingAPI from "./recorder";
-import formDataToBuffer from "../utils/formdatatobuffer";
 
 export default class Index extends Component {
   constructor(props) {
@@ -15,7 +14,7 @@ export default class Index extends Component {
   }
 
   componentDidMount() {
-    // axios.get('http://localhost:5000/api/v1.0/words')
+    // axios.get('http://localhost:8000/api/v1.0/words')
     //   .then(res => {
     //     this.setState({
     //       words: res.data.words,
@@ -24,10 +23,8 @@ export default class Index extends Component {
     //   });
     this.setState({
       words: [
-        { id: "bdji2379rgq0r3481", value: "happy" }
-        // {id: 'b09r093yrh79rgq0r', value: 'birthday'},
-        // {id: 'bdn93u0cjrgq0r10h', value: 'to'},
-        // {id: 'bdji12u30x9u0e1ua', value: 'you'}
+        {id: "bdji2379rgq0r3481", value: "happy" },
+        {id: 'b09r093yrh79rgq0r', value: 'birthday'},
       ],
       audios: [...new Array(0).fill(null)]
     });
@@ -43,18 +40,7 @@ export default class Index extends Component {
     this.setState({ audios });
   }
 
-  convertToBase64(blob) {
-    var reader = new FileReader();
-    reader.readAsDataURL(blob);
-    reader.onloadend = function() {
-      var base64data = reader.result;
-      console.log(base64data);
-      return base64data;
-    };
-  }
-
   submitData() {
-    var filename = new Date().toISOString();
     const { words, audios } = this.state;
     var data = [];
     for (var i = 0; i < words.length; i++) {
@@ -63,50 +49,28 @@ export default class Index extends Component {
         file: audios[i].blob
       });
     }
-    console.log(typeof data, "yeh hai data ");
-    console.log(data);
-    var myBlobData = data[0].file;
-    var base64myBlobData = this.convertToBase64(myBlobData);
-    console.log(myBlobData);
-    console.log("blob.data", myBlobData.data);
+
     var formData = new FormData();
-    formData.append("file", myBlobData, filename);
+    var filename = new Date().toISOString();
 
-    // const formDataToBufferObject = formDataToBuffer(formData);
-    // const config = {
-    //   headers: {
-    //     "Content-Type": "multipart/form-data",
-    //     "Access-Control-Allow-Origin": "*"
-    //   }
-    // };
-    // for (var key of formData.entries()) {
-    //   console.log(key[0] + ", " + key[1]);
-    // }
-    // console.log(typeof formData);
+    data.forEach((item, i) => {
+      formData.append(`${filename}-${i}`, item.file);
+    });
 
-    console.log(formData.file);
-
-    fetch("http://localhost:8000/api/v1.0/submit_data", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/octet-stream",
-        // "Content-Type": "multipart/form-data",
-        "Access-Control-Allow-Origin": "*"
-      },
-      body: myBlobData
-    }).then(response => console.log(response.data));
+    axios({
+      method: 'post',
+      url: 'http://localhost:8000/api/v1.0/submit_data',
+      data: formData,
+      config: {
+        headers: {
+          'Content-Type': 'application/json',
+          'Access-Control-Allow-Origin': "*"
+        }
+      }
+    }).then(function (response) {
+      console.log(response);
+    });
   }
-
-  //   axios
-  //     .post(
-  //       "http://localhost:8000/api/v1.0/submit_data",
-  //       { data: formData },
-  //       config
-  //     )
-  //     .then(res => {
-  //       console.log(res.data);
-  //     });
-  // }
 
   render() {
     const { words, audios } = this.state;
