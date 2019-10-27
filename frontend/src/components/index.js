@@ -1,9 +1,9 @@
-import React, { Component } from 'react';
-import axios from 'axios';
-import FormData from 'form-data';
+import React, { Component } from "react";
+import axios from "axios";
+import FormData from "form-data";
 
-import RecordingAPI from './recorder';
-import formDataToBuffer from '../utils/formdatatobuffer';
+import RecordingAPI from "./recorder";
+import formDataToBuffer from "../utils/formdatatobuffer";
 
 export default class Index extends Component {
   constructor(props) {
@@ -11,7 +11,7 @@ export default class Index extends Component {
     this.state = {
       words: [],
       audios: []
-    }
+    };
   }
 
   componentDidMount() {
@@ -24,7 +24,7 @@ export default class Index extends Component {
     //   });
     this.setState({
       words: [
-        {id: 'bdji2379rgq0r3481', value: 'happy'},
+        { id: "bdji2379rgq0r3481", value: "happy" }
         // {id: 'b09r093yrh79rgq0r', value: 'birthday'},
         // {id: 'bdn93u0cjrgq0r10h', value: 'to'},
         // {id: 'bdji12u30x9u0e1ua', value: 'you'}
@@ -37,39 +37,76 @@ export default class Index extends Component {
     const new_audio_object = {
       blob: audio,
       id: id
-    }
+    };
     const { audios } = this.state;
     audios[index] = new_audio_object;
     this.setState({ audios });
   }
 
+  convertToBase64(blob) {
+    var reader = new FileReader();
+    reader.readAsDataURL(blob);
+    reader.onloadend = function() {
+      var base64data = reader.result;
+      console.log(base64data);
+      return base64data;
+    };
+  }
+
   submitData() {
+    var filename = new Date().toISOString();
     const { words, audios } = this.state;
     var data = [];
     for (var i = 0; i < words.length; i++) {
       data.push({
         word: words[i].value,
-        file: audios[i].blob,
+        file: audios[i].blob
       });
     }
-    const formData = new FormData();
-    formData.append("document", "Ankan");
+    console.log(typeof data, "yeh hai data ");
+    console.log(data);
+    var myBlobData = data[0].file;
+    var base64myBlobData = this.convertToBase64(myBlobData);
+    console.log(myBlobData);
+    console.log("blob.data", myBlobData.data);
+    var formData = new FormData();
+    formData.append("file", myBlobData, filename);
+
     // const formDataToBufferObject = formDataToBuffer(formData);
-    const config = {
+    // const config = {
+    //   headers: {
+    //     "Content-Type": "multipart/form-data",
+    //     "Access-Control-Allow-Origin": "*"
+    //   }
+    // };
+    // for (var key of formData.entries()) {
+    //   console.log(key[0] + ", " + key[1]);
+    // }
+    // console.log(typeof formData);
+
+    console.log(formData.file);
+
+    fetch("http://localhost:8000/api/v1.0/submit_data", {
+      method: "POST",
       headers: {
-        'Content-Type': "multipart/form-data",
-        'Access-Control-Allow-Origin': "*"
-      }
-    }
-    for (var key of formData.entries()) {
-			console.log(key[0] + ', ' + key[1])
-		}
-    axios.post(
-      'http://localhost:8000/api/v1.0/submit_data',
-      {data: formData},
-      config
-    ).then((res) => {console.log(res.data)})
+        "Content-Type": "application/octet-stream",
+        // "Content-Type": "multipart/form-data",
+        "Access-Control-Allow-Origin": "*"
+      },
+      body: myBlobData
+    }).then(response => console.log(response.data));
   }
+
+  //   axios
+  //     .post(
+  //       "http://localhost:8000/api/v1.0/submit_data",
+  //       { data: formData },
+  //       config
+  //     )
+  //     .then(res => {
+  //       console.log(res.data);
+  //     });
+  // }
 
   render() {
     const { words, audios } = this.state;
@@ -81,7 +118,7 @@ export default class Index extends Component {
               <span>{word.value}</span>
               <RecordingAPI
                 id={index}
-                onDataSubmit={(audio) => this.addAudio(audio, index, word.id)}
+                onDataSubmit={audio => this.addAudio(audio, index, word.id)}
               />
             </li>
           ))}
@@ -89,8 +126,10 @@ export default class Index extends Component {
         <button
           onClick={this.submitData.bind(this)}
           disabled={audios.indexOf(null) > -1}
-        >Submit</button>
+        >
+          Submit
+        </button>
       </div>
-    )
+    );
   }
 }

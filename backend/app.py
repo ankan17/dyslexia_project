@@ -35,7 +35,11 @@ CORS(app)
 
 @app.route('/api/v1.0/submit_data', methods=['POST'])
 def get_data():
-    print(request.form)
+    print(request.data)
+    f= open("./file.wav",'wb')
+    f.write(request.data)
+    f.close()
+    # print(type(request.form))
     # print(request.form['data'])
-    print(request.files)
+    print("Apna try")
     return jsonify(request.form)

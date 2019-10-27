@@ -5,6 +5,8 @@ db/
 __pycache__/
 
 # dependencies
+env/
+file.wav
 node_modules/
 /.pnp
 .pnp.js
