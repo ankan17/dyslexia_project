@@ -1,14 +1,3 @@
-# post_data = {
-#     'title': 'Python and MongoDB',
-#     'content': 'PyMongo is fun, you guys',
-#     'author': 'Bill'
-# }
-# result = posts.insert_one(post_data)
-# print('One post: {0}'.format(result.inserted_id))
-
-# bills_post = posts.find_one({'author': 'Bill'})
-# print(bills_post)
-
 from flask import Flask, jsonify, request
 from pymongo import MongoClient
 from flask_cors import CORS
@@ -40,3 +29,10 @@ def get_data():
         files[file].save("%s.wav" % (file))
 
     return jsonify(request.form)
+
+
+@app.route('/api/v1.0/register', methods=['POST'])
+def register_student():
+    subjects = db["subjects"]
+    result = subjects.insert_one(request.json)
+    return jsonify({'id': str(result.inserted_id)})
