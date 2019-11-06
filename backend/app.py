@@ -36,3 +36,25 @@ def register_student():
     subjects = db["subjects"]
     result = subjects.insert_one(request.json)
     return jsonify({'id': str(result.inserted_id)})
+
+
+@app.route('/api/v1.0/status', methods=['GET'])
+def get_test_status():
+    id = request.args.get('id')
+    response = {}
+
+    subjects = db.subjects.find()
+    for sub in subjects:
+        if str(sub.get('_id'))[:8] == id:
+            response['first_name'] = sub['first_name']
+            response['last_name'] = sub['last_name']
+            response['completed'] = []
+            break
+
+    status = db.status.find()
+    for s in status:
+        if str(s.get('id'))[:8] == id:
+            response['completed'] += s.get('completed')
+            break
+
+    return response
