@@ -2,6 +2,7 @@ import React, { Component } from "react";
 import { BrowserRouter as Router, Route } from "react-router-dom";
 
 import Index from './components/index';
+import Test from './components/test';
 
 
 const AppRouter = () => {
@@ -9,6 +10,7 @@ const AppRouter = () => {
     <div>
       <Router>
         <Route path="/" exact component={Index} />
+        <Route path="/test/:id" exact component={Test} />
       </Router>
     </div>
   );

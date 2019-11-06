@@ -44,11 +44,23 @@ export default class RecordingAPI extends React.Component {
   render() {
     const {recording} = this.state;
     return (
-      <div>
-        <audio ref={"player_" + this.props.id} controls></audio>
-        {!recording && <button id="record" onClick={this.recordAudio.bind(this)}>Record</button>}
-        {recording && <button id="stop" onClick={this.stopRecording.bind(this)}>Stop</button>}
-      </div>
+      <span className="recorder">
+        {!recording &&
+          <button
+            className="waves-effect waves-light btn-floating red record"
+            id="record" onClick={this.recordAudio.bind(this)}>
+              <i class="material-icons white-text">mic</i>
+          </button>
+        }
+        {recording &&
+          <button
+            className="waves-effect waves-light btn-floating deep-orange lighten-5 stop"
+            id="stop" onClick={this.stopRecording.bind(this)}>
+              <i class="material-icons red-text">stop</i>Stop
+          </button>
+        }
+        <audio ref={"player_" + this.props.id} controls />
+      </span>
     );
   }
 }
