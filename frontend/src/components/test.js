@@ -40,14 +40,16 @@ export default class Test extends Component {
       })
   }
 
-  addAudio(audio, index, id) {
+  addAudio(audio, index, id, cancel) {
     const new_audio_object = {
       blob: audio,
       id: id
     };
     const { audios } = this.state;
-    audios[index] = new_audio_object;
+    if (!cancel) audios[index] = new_audio_object;
+    else audios[index] = null;
     this.setState({ audios });
+    console.log("audio vaala array", audios);
   }
 
   removeAudio(index) {
@@ -89,6 +91,19 @@ export default class Test extends Component {
     }).then(function(response) {
       console.log(response);
     });
+  }
+
+  audiosIsNull() {
+    for (var j = 0; j < this.state.audios.length; j++) {
+      if (this.state.audios[j] != null) return false;
+    }
+    return true;
+  }
+
+  deleteAudio(x, num) {
+    const { audios } = this.state;
+    audios[num] = x;
+    this.setState({ audios });
   }
 
   render() {
