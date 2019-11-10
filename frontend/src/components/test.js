@@ -16,31 +16,35 @@ export default class Test extends Component {
   }
 
   componentDidMount() {
-    const { match: { params } } = this.props;
-    axios.get('http://localhost:8000/api/v1.0/words')
-      .then(res => {
-        this.setState({
-          words: res.data.words,
-          audios: [...new Array(res.data.words.length).fill(null)]
-        });
+    const {
+      match: { params }
+    } = this.props;
+    axios.get("http://localhost:8000/api/v1.0/words").then(res => {
+      this.setState({
+        words: res.data.words,
+        audios: [...new Array(res.data.words.length).fill(null)]
       });
-    axios.get(`http://localhost:8000/api/v1.0/status?id=${params.id}`)
+    });
+    axios
+      .get(`http://localhost:8000/api/v1.0/status?id=${params.id}`)
       .then(response => {
         this.setState({
           completed: [...response.data.completed],
           name: `${response.data.first_name} ${response.data.last_name}`
-        })
-      })
+        });
+      });
   }
 
-  addAudio(audio, index, id) {
+  addAudio(audio, index, id, cancel) {
     const new_audio_object = {
       blob: audio,
       id: id
     };
     const { audios } = this.state;
-    audios[index] = new_audio_object;
+    if (!cancel) audios[index] = new_audio_object;
+    else audios[index] = null;
     this.setState({ audios });
+    console.log("audio vaala array", audios);
   }
 
   submitData() {
@@ -61,61 +65,88 @@ export default class Test extends Component {
     });
 
     axios({
-      method: 'post',
-      url: 'http://localhost:8000/api/v1.0/submit_data',
+      method: "post",
+      url: "http://localhost:8000/api/v1.0/submit_data",
       data: formData,
       config: {
         headers: {
-          'Content-Type': 'application/json',
-          'Access-Control-Allow-Origin': "*"
+          "Content-Type": "application/json",
+          "Access-Control-Allow-Origin": "*"
         }
       }
-    }).then(function (response) {
+    }).then(function(response) {
       console.log(response);
     });
+  }
+
+  audiosIsNull() {
+    for (var j = 0; j < this.state.audios.length; j++) {
+      if (this.state.audios[j] != null) return false;
+    }
+    return true;
+  }
+
+  deleteAudio(x, num) {
+    const { audios } = this.state;
+    audios[num] = x;
+    this.setState({ audios });
   }
 
   render() {
     const { words, audios, completed, name } = this.state;
     return (
       <div className="container">
-        <h3 className="center-align">Welcome, { name }</h3>
-        <div class="pt-2 progress-bar right-align">
-          <div class="progress ">
+        <h3 className="center-align">Welcome, {name}</h3>
+        <div className="pt-2 progress-bar right-align">
+          <div className="progress ">
             <div
-              class="determinate"
-              style={{width: `${completed.length/words.length*100}%`}}>
-            </div>
+              className="determinate"
+              style={{ width: `${(completed.length / words.length) * 100}%` }}
+            ></div>
           </div>
-          <span class="progress-label">{completed.length}/{words.length}</span>
+          <span className="progress-label">
+            {completed.length}/{words.length}
+          </span>
         </div>
 
-        <div class="mt-2">
-          { words.map((word, index) => {
-            return completed.includes(word.id) ?
-              <div key={ word.id } id={ word.id } className="row recorder">
-               <span className="recorder-word col s2 offset-s2" style={{ "fontSize": '18px' }}>
-                  { `${index+1}. ${word.value}` }
-               </span>
-               <span className="green-text" style={{ "fontSize": '16px' }}>Completed</span>
-              </div> :
-              <div key={ word.id } id={ word.id } className="row">
-               <span className="recorder-word col s2 offset-s2" style={{ "fontSize": '18px' }}>
-                  { `${index+1}. ${word.value}` }
-               </span>
-               <RecordingAPI
-                 id={index}
-                 onDataSubmit={audio => this.addAudio(audio, index, word.id)}
-               />
-             </div>
-            }
-          )}
+        <div className="mt-2">
+          {words.map((word, index) => {
+            return completed.includes(word.id) ? (
+              <div key={word.id} id={word.id} className="row recorder">
+                <span
+                  className="recorder-word col s2 offset-s2"
+                  style={{ fontSize: "18px" }}
+                >
+                  {`${index + 1}. ${word.value}`}
+                </span>
+                <span className="green-text" style={{ fontSize: "16px" }}>
+                  Completed
+                </span>
+              </div>
+            ) : (
+              <div key={word.id} id={word.id} className="row">
+                <span
+                  className="recorder-word col s2 offset-s2"
+                  style={{ fontSize: "18px" }}
+                >
+                  {`${index + 1}. ${word.value}`}
+                </span>
+                <RecordingAPI
+                  id={index}
+                  onDataSubmit={(audio, cancel) =>
+                    this.addAudio(audio, index, word.id, cancel)
+                  }
+                  //kuchbhi={val => this.deleteAudio(val, index)}
+                />
+              </div>
+            );
+          })}
         </div>
-        <div class="row center-align mt-2">
+        <div className="row center-align mt-2">
           <button
             className="btn"
             onClick={this.submitData.bind(this)}
-            disabled={audios.indexOf(null) > -1}
+            disabled={this.audiosIsNull()}
           >
             Submit
           </button>
