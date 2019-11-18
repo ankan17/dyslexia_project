@@ -143,11 +143,11 @@ export default class Index extends Component {
                   </div>
                 </div>
 
-                <div className="row mt-2 center-align">
+                <div className="row center-align">
                   <div className="col s12">
                     <button
                       type="submit"
-                      className="btn"
+                      className="btn mt-3"
                       onClick={this.submitData.bind(this)}>Submit
                     </button>
                   </div>
