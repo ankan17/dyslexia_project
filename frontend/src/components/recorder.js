@@ -17,10 +17,14 @@ export default class RecordingAPI extends React.Component {
     };
     const stream = await navigator.mediaDevices.getUserMedia(constraints);
     this.mediaRecorder = new MediaRecorder(stream);
-
+    let buffer = [];
     this.mediaRecorder.ondataavailable = e => {
+      //  console.log(this.state.recordedChunks, e.data);
       if (e.data.size > 0) {
-        this.setState({ recordedChunks: [...this.state.recordedChunks, e.data] });
+        buffer.push(e.data);
+        this.setState({
+          recordedChunks: buffer
+        });
       }
     };
 
@@ -47,7 +51,8 @@ export default class RecordingAPI extends React.Component {
         {!recording && (
           <button
             className="waves-effect waves-light btn-floating deep-orange record"
-            id="record" onClick={this.recordAudio.bind(this)}
+            id="record"
+            onClick={this.recordAudio.bind(this)}
           >
             <i className="material-icons white-text">mic</i>
           </button>
@@ -55,13 +60,14 @@ export default class RecordingAPI extends React.Component {
         {recording && (
           <button
             className="waves-effect waves-light btn-floating red lighten-5 stop"
-            id="stop" onClick={this.stopRecording.bind(this)}
+            id="stop"
+            onClick={this.stopRecording.bind(this)}
           >
             <i className="material-icons red-text">stop</i>Stop
           </button>
         )}
         <audio src={this.state.dataUrl} controls />
-        { this.state.dataUrl !== "" &&
+        {this.state.dataUrl !== "" && (
           <button
             className="waves-light btn-flat ml-1"
             onClick={() => {
@@ -71,9 +77,11 @@ export default class RecordingAPI extends React.Component {
               });
             }}
           >
-            <i className="material-icons red-text" style={{ "fontSize": "21px", }}>delete</i>
+            <i className="material-icons red-text" style={{ fontSize: "21px" }}>
+              delete
+            </i>
           </button>
-        }
+        )}
       </span>
     );
   }

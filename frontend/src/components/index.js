@@ -1,6 +1,6 @@
 import React, { Component } from "react";
 import axios from "axios";
-import Materialize from 'materialize-css';
+import Materialize from "materialize-css";
 import moment from "moment";
 import "materialize-css/dist/css/materialize.min.css";
 import "materialize-css/dist/js/materialize.min.js";
@@ -14,7 +14,7 @@ export default class Index extends Component {
       date_of_birth: "",
       gender: "male",
       student_id: null
-    }
+    };
   }
 
   componentDidMount() {
@@ -35,45 +35,46 @@ export default class Index extends Component {
   submitData(e) {
     e.preventDefault();
     var valid = true;
-    var firstNameElem = document.getElementById('first_name');
-    var lastNameElem = document.getElementById('last_name');
-    var dobElem = document.getElementById('dob');
+    var firstNameElem = document.getElementById("first_name");
+    var lastNameElem = document.getElementById("last_name");
+    var dobElem = document.getElementById("dob");
 
     // Validation
     if (!this.state.first_name) {
-      firstNameElem.classList.add('invalid');
+      firstNameElem.classList.add("invalid");
       valid = false;
     } else {
-      firstNameElem.classList.remove('invalid');
+      firstNameElem.classList.remove("invalid");
     }
     if (!this.state.last_name) {
-      lastNameElem.classList.add('invalid');
+      lastNameElem.classList.add("invalid");
       valid = false;
     } else {
-      lastNameElem.classList.remove('invalid');
+      lastNameElem.classList.remove("invalid");
     }
     if (!this.state.date_of_birth) {
-      dobElem.classList.add('invalid');
+      dobElem.classList.add("invalid");
       valid = false;
     } else {
-      dobElem.classList.remove('invalid');
+      dobElem.classList.remove("invalid");
     }
 
-    if (valid)  {
-      var data = {...this.state};
+    if (valid) {
+      var data = { ...this.state };
       var context = this;
       axios({
-        method: 'post',
-        url: 'http://localhost:8000/api/v1.0/register',
+        method: "post",
+        url: "http://localhost:8000/api/v1.0/register",
         data: data,
         config: {
           headers: {
-            'Content-Type': 'application/json',
-            'Access-Control-Allow-Origin': "*"
+            "Content-Type": "application/json",
+            "Access-Control-Allow-Origin": "*"
           }
         }
       }).then(function(response) {
-        context.setState({student_id: response.data.id});
+        context.setState({ student_id: response.data.id });
+        console.log(response.data.id);
       });
     }
   }
@@ -88,57 +89,92 @@ export default class Index extends Component {
                 <div className="row">
                   <div className="input-field col s6">
                     <input
-                      placeholder="First Name" id="first_name"
-                      type="text" value={this.state.first_name}
-                      onChange={(e) => this.setState({first_name: e.target.value})}
-                      className="validate" />
+                      placeholder="First Name"
+                      id="first_name"
+                      type="text"
+                      value={this.state.first_name}
+                      onChange={e =>
+                        this.setState({ first_name: e.target.value })
+                      }
+                      className="validate"
+                    />
                     <label htmlFor="first_name">First Name</label>
-                    <span className="helper-text" data-error="Please fill this field"></span>
+                    <span
+                      className="helper-text"
+                      data-error="Please fill this field"
+                    ></span>
                   </div>
                   <div className="input-field col s6">
                     <input
-                      placeholder="Last Name" id="last_name"
-                      type="text" value={this.state.last_name}
-                      onChange={(e) => this.setState({last_name: e.target.value})}
-                      className="validate" required="" aria-required="true" />
+                      placeholder="Last Name"
+                      id="last_name"
+                      type="text"
+                      value={this.state.last_name}
+                      onChange={e =>
+                        this.setState({ last_name: e.target.value })
+                      }
+                      className="validate"
+                      required=""
+                      aria-required="true"
+                    />
                     <label htmlFor="last_name">Last Name</label>
-                    <span className="helper-text" data-error="Please fill this field"></span>
+                    <span
+                      className="helper-text"
+                      data-error="Please fill this field"
+                    ></span>
                   </div>
                 </div>
 
                 <div className="row">
                   <div className="input-field col s12">
                     <input
-                      type="text" id="dob" className="datepicker validate"
+                      type="text"
+                      id="dob"
+                      className="datepicker validate"
                       value={this.state.date_of_birth}
-                      onChange={(e) => this.setState({date_of_birth: e.target.value})}
-                      required="" aria-required="true"
+                      onChange={e =>
+                        this.setState({ date_of_birth: e.target.value })
+                      }
+                      required=""
+                      aria-required="true"
                     />
                     <label htmlFor="dob">Date of birth</label>
-                    <span className="helper-text" data-error="Please fill this field"></span>
+                    <span
+                      className="helper-text"
+                      data-error="Please fill this field"
+                    ></span>
                   </div>
                 </div>
 
                 <div className="row">
                   <div className="input-field col s3">
                     <label>
-                        <input
-                          type="radio" className="with-gap"
-                          name="gender" value="male"
-                          checked={this.state.gender === "male"}
-                          onChange={(e) => this.setState({gender: e.target.value})}/>
-                        <span>Male</span>
+                      <input
+                        type="radio"
+                        className="with-gap"
+                        name="gender"
+                        value="male"
+                        checked={this.state.gender === "male"}
+                        onChange={e =>
+                          this.setState({ gender: e.target.value })
+                        }
+                      />
+                      <span>Male</span>
                     </label>
                   </div>
                   <div className="input-field col s3">
                     <label>
-                        <input
-                          type="radio" className="with-gap"
-                          name="gender" value="female"
-                          checked={this.state.gender === "female"}
-                          onChange={(e) => this.setState({gender: e.target.value})}
-                        />
-                        <span>Female</span>
+                      <input
+                        type="radio"
+                        className="with-gap"
+                        name="gender"
+                        value="female"
+                        checked={this.state.gender === "female"}
+                        onChange={e =>
+                          this.setState({ gender: e.target.value })
+                        }
+                      />
+                      <span>Female</span>
                     </label>
                   </div>
                 </div>
@@ -148,7 +184,9 @@ export default class Index extends Component {
                     <button
                       type="submit"
                       className="btn mt-3"
-                      onClick={this.submitData.bind(this)}>Submit
+                      onClick={this.submitData.bind(this)}
+                    >
+                      Submit
                     </button>
                   </div>
                 </div>
@@ -166,10 +204,19 @@ export default class Index extends Component {
               <span className="check_icon">
                 <i className="material-icons">check</i>
               </span>
-              <h5 class="mt-2">Please note down your unique id: <span className="test_id">{ id }</span></h5>
-              <h6 class="mt-1" style={{color: '#333'}}>Click
-                <a className="test_link" href={`http://localhost:3000/test/${id}`}>here</a>
-                 to head over to the test right now
+              <h5 class="mt-2">
+                Please note down your unique id:{" "}
+                <span className="test_id">{id}</span>
+              </h5>
+              <h6 class="mt-1" style={{ color: "#333" }}>
+                Click
+                <a
+                  className="test_link"
+                  href={`http://localhost:3000/test/${id}`}
+                >
+                  here
+                </a>
+                to head over to the test right now
               </h6>
             </div>
           </div>
