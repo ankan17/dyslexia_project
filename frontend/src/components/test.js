@@ -21,14 +21,14 @@ export default class Test extends Component {
     const {
       match: { params }
     } = this.props;
-    axios.get("http://localhost:8000/api/v1.0/words").then(res => {
+    axios.get(`http://localhost:8000/api/v1.0/words?lang=${params.lang}`).then(res => {
       this.setState({
         words: res.data.words,
         audios: [...new Array(res.data.words.length).fill(null)]
       });
     });
     axios
-      .get(`http://localhost:8000/api/v1.0/status?id=${params.id}`)
+      .get(`http://localhost:8000/api/v1.0/status?id=${params.id}&lang=${params.lang}`)
       .then(response => {
         this.setState({
           completed: [...response.data.completed],
@@ -85,9 +85,10 @@ export default class Test extends Component {
       formData.append(`${item.id}_${item.word}.wav`, item.file);
     });
 
+    var context = this;
     axios({
       method: "post",
-      url: `http://localhost:8000/api/v1.0/submit_data?id=${params.id}`,
+      url: `http://localhost:8000/api/v1.0/submit_data?id=${params.id}&lang=${params.lang}`,
       data: formData,
       config: {
         headers: {

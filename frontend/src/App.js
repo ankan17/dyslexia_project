@@ -10,7 +10,7 @@ const AppRouter = () => {
     <div>
       <Router>
         <Route path="/" exact component={Index} />
-        <Route path="/test/:id" exact component={Test} />
+        <Route path="/test/:lang/:id" exact component={Test} />
       </Router>
     </div>
   );
