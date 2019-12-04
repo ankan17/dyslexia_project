@@ -21,18 +21,20 @@ export default class Test extends Component {
     const {
       match: { params }
     } = this.props;
-    axios.get(`http://localhost:8000/api/v1.0/words?lang=${params.lang}`).then(res => {
-      this.setState({
-        words: res.data.words,
-        audios: [...new Array(res.data.words.length).fill(null)]
+    axios.get(`http://localhost:8000/api/v1.0/words?lang=${params.lang}`)
+      .then(res => {
+        this.setState({
+          words: res.data.words,
+          audios: [...new Array(res.data.words.length).fill(null)]
+        });
       });
-    });
     axios
       .get(`http://localhost:8000/api/v1.0/status?id=${params.id}&lang=${params.lang}`)
       .then(response => {
         this.setState({
           completed: [...response.data.completed],
-          name: `${response.data.first_name}`
+          name: `${response.data.first_name}`,
+          current: response.data.completed.length
         });
       })
       .catch(e => {
@@ -99,6 +101,7 @@ export default class Test extends Component {
     }).then(function(response) {
       context.setState({
         completed: [...response.data.completed],
+        current: response.data.completed.length
       });
     });
   }
