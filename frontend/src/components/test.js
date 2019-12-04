@@ -41,16 +41,20 @@ export default class Test extends Component {
       });
   }
 
-  addAudio(audio, index, id, cancel) {
+  addAudio(audio, audioUrl, index, id, cancel) {
     const new_audio_object = {
       blob: audio,
-      id: id
+      id: id,
+      url: audioUrl
     };
-    const { audios } = this.state;
-    if (!cancel) audios[index] = new_audio_object;
-    else audios[index] = null;
-    this.setState({ audios });
-    console.log("audio vaala array", audios);
+    const { audios, audioUrls } = this.state;
+    if (!cancel) {
+      audios[index] = new_audio_object;
+    }
+    else {
+      audios[index] = null;
+    }
+    this.setState({ audios, audioUrls });
   }
 
   removeAudio(index) {
@@ -92,7 +96,9 @@ export default class Test extends Component {
         }
       }
     }).then(function(response) {
-      console.log(response);
+      context.setState({
+        completed: [...response.data.completed],
+      });
     });
   }
 
@@ -110,8 +116,10 @@ export default class Test extends Component {
   }
 
   render() {
-    const { words, audios, completed, name, error } = this.state;
-    if (!error) {
+    const { words, audios, completed, name, error, current } = this.state;
+    const word = words[current];
+    const audio = audios[current];
+    if (!error && word) {
       return (
         <div className="container">
           <h3 className="center-align">Welcome, {name}</h3>
@@ -123,78 +131,93 @@ export default class Test extends Component {
               ></div>
             </div>
             <span className="progress-label">
-              {completed.length}/{words.length}
+              {current+1}/{words.length}
             </span>
           </div>
 
           <div className="mt-2">
-            {words.map((word, index) => {
-              return completed.includes(word.id) ? (
-                <div key={word.id} id={word.id} className="row recorder">
-                  <span
-                    className="recorder-word col s2 offset-s2"
-                    style={{ fontSize: "18px" }}
-                  >
-                    {`${index + 1}. ${word.value}`}
-                  </span>
-                  <span className="green-text" style={{ fontSize: "16px" }}>
+            <div id={word.id} className="row recorder">
+              <h1
+                className="recorder-word center-align"
+                style={{ fontSize: "78px", "marginBottom": "2em" }}
+              >
+                {word.value}
+              </h1>
+              <div className="row center-align">
+                {!
+                  completed.includes(word.id) ?
+                  audio !== null ? (
+                    <RecordingAPI
+                      id={current} blob={audio.blob} blobUrl={audio.url}
+                      onDataSubmit={(audio, audioUrl) => this.addAudio(audio, audioUrl, current, word.id)}
+                      onDataRemove={() => this.removeAudio(current)}
+                    /> ) : (
+                    <RecordingAPI
+                      id={current} blob={null} blobUrl=""
+                      onDataSubmit={(audio, audioUrl) => this.addAudio(audio, audioUrl, current, word.id)}
+                      onDataRemove={() => this.removeAudio(current)}
+                    /> )
+                   : (
+                  <span className="green-text" style={{ fontSize: "26px" }}>
                     Completed
-                  </span>
-                </div>
-              ) : this.state.current === index ? (
-                <div key={word.id} id={word.id} className="row">
-                  <button
-                    onClick={() =>
-                      this.state.current !== 0
-                        ? this.setState({ current: this.state.current - 1 })
-                        : false
-                    }
-                  >
-                    Previous
-                  </button>
-                  <span
-                    className="recorder-word col s2 offset-s2"
-                    style={{ fontSize: "18px" }}
-                  >
-                    {`${index + 1}. ${word.value}`}
-                  </span>
+                  </span> )
+                }
+              </div>
+            </div>
 
-                  <RecordingAPI
-                    id={index}
-                    onDataSubmit={audio => this.addAudio(audio, index, word.id)}
-                    onDataRemove={() => this.removeAudio(index)}
-                  />
-                  <button
-                    onClick={() =>
-                      this.state.current !== words.length - 1
-                        ? this.setState({ current: this.state.current + 1 })
-                        : false
-                    }
-                  >
-                    {" "}
-                    Next{" "}
-                  </button>
-                </div>
-              ) : (
-                <div />
-              );
-            })}
-          </div>
-          <div className="row center-align mt-2">
-            <button
-              className="btn"
-              type="submit"
-              onClick={this.submitData.bind(this)}
-              disabled={audios.filter(x => x === null).length >= 1}
+            <div className="row"
+              style={{"marginTop": "100px"}}
             >
-              Submit
-            </button>
+              <button
+                className="waves-light btn-floating"
+                disabled={this.state.current === 0}
+                onClick={() =>
+                  this.setState({ current: this.state.current - 1 })
+                }
+              >
+                <i className="material-icons white-text">navigate_before</i>
+              </button>
+              <button
+                className="waves-light btn-floating"
+                style={{"float": "right", "clear": "both"}}
+                disabled={this.state.current >= words.length-1}
+                onClick={() =>
+                  this.setState({ current: this.state.current + 1 })
+                }
+              >
+                <i className="material-icons white-text">navigate_next</i>
+              </button>
+            </div>
+
+            <div className="row center-align mt-2">
+              {completed.length < words.length &&
+               audios.filter(x => x === null).length - completed.length === 0 ? (
+                <button
+                  className="btn"
+                  type="submit"
+                  onClick={this.submitData.bind(this)}
+                >
+                  Submit
+                </button> ) :
+                null
+              }
+              {audios.filter(x => x === null).length - completed.length >= 1 ? (
+                <button
+                  className="btn red"
+                  type="submit"
+                  onClick={this.submitData.bind(this)}
+                >
+                  End test
+                </button> ) :
+                null
+              }
+            </div>
           </div>
         </div>
       );
     } else {
       // This part will also be removed
-      return <div>{error}</div>;
+      return error;
     }
   }
 }

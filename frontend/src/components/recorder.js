@@ -10,6 +10,13 @@ export default class RecordingAPI extends React.Component {
     };
   }
 
+  componentDidMount() {
+    this.setState({
+      recordedChunks: this.props.blob,
+      dataUrl: this.props.blobUrl
+    });
+  }
+
   async recordAudio() {
     const constraints = {
       audio: true,
@@ -19,7 +26,6 @@ export default class RecordingAPI extends React.Component {
     this.mediaRecorder = new MediaRecorder(stream);
     let buffer = [];
     this.mediaRecorder.ondataavailable = e => {
-      //  console.log(this.state.recordedChunks, e.data);
       if (e.data.size > 0) {
         buffer.push(e.data);
         this.setState({
@@ -40,7 +46,7 @@ export default class RecordingAPI extends React.Component {
     var context = this;
 
     this.setState({ dataUrl: blobUrl, recording: false }, () => {
-      context.props.onDataSubmit(blob);
+      context.props.onDataSubmit(blob, blobUrl);
     });
   }
 
