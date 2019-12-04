@@ -33,7 +33,7 @@ def submit_data():
     id = request.args.get('id')
     lang = request.args.get('lang')
 
-    subject = find_by_truncated_id(db.subjects.find(), id)
+    subject = find_by_truncated_id(db.subjects, id)
     if not subject:
         e = "No student found with the id"
         return jsonify({'message': e}), 404
@@ -47,8 +47,7 @@ def submit_data():
     response = {}
     response['first_name'] = subject['first_name']
 
-    status = db.status.find()
-    result = find_by_truncated_id(status, id, "subject_id")
+    result = find_by_truncated_id(db.status, id, "subject_id")
     completed = result.get('completed')
 
     files = request.files.to_dict()
@@ -85,8 +84,7 @@ def get_test_status():
     lang = request.args.get('lang')
     response = {}
 
-    subjects = db.subjects.find()
-    subject = find_by_truncated_id(subjects, id)
+    subject = find_by_truncated_id(db.subjects, id)
     if not subject:
         e = "No student found with the id"
         return jsonify(error=404, text=str(e)), 404
@@ -94,11 +92,32 @@ def get_test_status():
     response['first_name'] = subject['first_name']
     response['completed'] = []
 
-    status = db.status.find()
-    result = find_by_truncated_id(status, id, "subject_id")
+    result = find_by_truncated_id(db.status, id, "subject_id")
     if result:
         response['completed'] += result.get('completed')[lang]
 
     print(response)
+
+    return jsonify(response)
+
+
+@app.route('/api/v1.0/subjects', methods=['GET'])
+def get_subjects():
+    eng_word_count = db.words.count({'lang': 'eng'})
+    ben_word_count = db.words.count({'lang': 'eng'})
+
+    response = {'subjects': []}
+
+    subjects = db.subjects.find()
+    for s in subjects:
+        status = db.status.find_one({'subject_id': s['_id']})
+        eng_test_completed = len(status['completed']['eng']) == eng_word_count
+        ben_test_completed = len(status['completed']['ben']) == ben_word_count
+        response['subjects'].append({
+            'id': str(s['_id']),
+            'name': "%s %s" % (s['first_name'], s['last_name']),
+            'eng_test_status': eng_test_completed,
+            'ben_test_status': ben_test_completed,
+        })
 
     return jsonify(response)

@@ -210,13 +210,12 @@ export default class Index extends Component {
               </h5>
               <h6 class="mt-1" style={{ color: "#333" }}>
                 Click
-                <a
-                  className="test_link"
-                  href={`http://localhost:3000/test/${id}`}
-                >
-                  here
-                </a>
-                to head over to the test right now
+                <a className="test_link" href={`test/eng/${id}`}>here</a>
+                to head over to the English test right now
+              </h6><h6 class="mt-1" style={{ color: "#333" }}>
+                Click
+                <a className="test_link" href={`test/ben/${id}`}>here</a>
+                to head over to the Bengali test right now
               </h6>
             </div>
           </div>
