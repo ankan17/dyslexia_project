@@ -1,6 +1,8 @@
 import React, { Component } from "react";
 import axios from "axios";
 
+import { server_address } from '../constants';
+
 export default class Subjects extends Component {
   constructor(props) {
     super(props);
@@ -9,7 +11,7 @@ export default class Subjects extends Component {
     };
   }
   componentDidMount() {
-    axios.get('http://localhost:8000/api/v1.0/subjects')
+    axios.get(`${server_address}/api/v1.0/subjects`)
       .then((response) => {
         this.setState({
           subjects: response.data.subjects

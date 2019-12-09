@@ -3,6 +3,7 @@ import axios from "axios";
 import FormData from "form-data";
 
 import RecordingAPI from "./recorder";
+import { server_address } from '../constants';
 
 export default class Test extends Component {
   constructor(props) {
@@ -21,7 +22,7 @@ export default class Test extends Component {
     const {
       match: { params }
     } = this.props;
-    axios.get(`http://localhost:8000/api/v1.0/words?lang=${params.lang}`)
+    axios.get(`${server_address}/api/v1.0/words?lang=${params.lang}`)
       .then(res => {
         this.setState({
           words: res.data.words,
@@ -29,7 +30,7 @@ export default class Test extends Component {
         });
       });
     axios
-      .get(`http://localhost:8000/api/v1.0/status?id=${params.id}&lang=${params.lang}`)
+      .get(`${server_address}/api/v1.0/status?id=${params.id}&lang=${params.lang}`)
       .then(response => {
         this.setState({
           completed: [...response.data.completed],
@@ -90,7 +91,7 @@ export default class Test extends Component {
     var context = this;
     axios({
       method: "post",
-      url: `http://localhost:8000/api/v1.0/submit_data?id=${params.id}&lang=${params.lang}`,
+      url: `${server_address}/api/v1.0/submit_data?id=${params.id}&lang=${params.lang}`,
       data: formData,
       config: {
         headers: {
@@ -101,7 +102,6 @@ export default class Test extends Component {
     }).then(function(response) {
       context.setState({
         completed: [...response.data.completed],
-        current: response.data.completed.length
       });
     });
   }
@@ -143,7 +143,7 @@ export default class Test extends Component {
             <div id={word.id} className="row recorder">
               <h1
                 className="recorder-word center-align"
-                style={{ fontSize: "78px", "marginBottom": "2em" }}
+                style={{ fontSize: "128px", "marginBottom": "1.5em" }}
               >
                 {word.value}
               </h1>
@@ -170,7 +170,7 @@ export default class Test extends Component {
             </div>
 
             <div className="row"
-              style={{"marginTop": "100px"}}
+              style={{"marginTop": "60px"}}
             >
               <button
                 className="waves-light btn-floating"

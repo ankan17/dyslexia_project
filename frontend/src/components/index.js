@@ -5,6 +5,8 @@ import moment from "moment";
 import "materialize-css/dist/css/materialize.min.css";
 import "materialize-css/dist/js/materialize.min.js";
 
+import { server_address } from '../constants';
+
 export default class Index extends Component {
   constructor(props) {
     super(props);
@@ -64,7 +66,7 @@ export default class Index extends Component {
       var context = this;
       axios({
         method: "post",
-        url: "http://localhost:8000/api/v1.0/register",
+        url: `${server_address}/api/v1.0/register`,
         data: data,
         config: {
           headers: {
