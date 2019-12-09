@@ -1,4 +1,6 @@
 import os
+import librosa
+import soundfile
 
 from flask import Flask, jsonify, request
 from pymongo import MongoClient
@@ -53,6 +55,8 @@ def submit_data():
     files = request.files.to_dict()
     for file in files:
         files[file].save(file)
+        x, _ = librosa.load(file, sr=16000)
+        soundfile.write(file, x, 16000)
         completed[lang].append(file.split('_')[0])
 
     response['completed'] = completed[lang]
@@ -111,8 +115,11 @@ def get_subjects():
     subjects = db.subjects.find()
     for s in subjects:
         status = db.status.find_one({'subject_id': s['_id']})
-        eng_test_completed = len(status['completed']['eng']) == eng_word_count
-        ben_test_completed = len(status['completed']['ben']) == ben_word_count
+        if status:
+            eng_test_completed = len(status['completed']['eng']) == eng_word_count
+            ben_test_completed = len(status['completed']['ben']) == ben_word_count
+        else:
+            eng_test_completed, ben_test_completed = False, False
         response['subjects'].append({
             'id': str(s['_id']),
             'name': "%s %s" % (s['first_name'], s['last_name']),
