@@ -70,6 +70,58 @@ def submit_data():
     return jsonify(response)
 
 
+@app.route('/api/v2.0/submit_data', methods=['POST'])
+def submit_data_v2():
+    id = request.args.get('id')
+    lang = request.args.get('lang')
+
+    subject = find_by_truncated_id(db.subjects, id)
+    if not subject:
+        e = "No student found with the id"
+        return jsonify({'message': e}), 404
+    full_id = subject.get('_id')
+
+    dir_path = os.path.join(UPLOAD_FOLDER, id, lang)
+    if not os.path.exists(dir_path):
+        os.makedirs(dir_path)
+    os.chdir(dir_path)
+
+    response = {}
+    response['first_name'] = subject['first_name']
+
+    result = find_by_truncated_id(db.status, id, "subject_id")
+    completed = result.get('completed')
+
+    files = request.files.to_dict()
+    print(request.files)
+    for file in files:
+        files[file].save(file)
+        x, _ = librosa.load(file, sr=16000)
+        soundfile.write(file, x, 16000)
+
+        start, end = file.split('_')
+        start = int(start)
+        end = int(end[:-4])
+        print(start, end)
+        words = db.words.find({'lang': lang})
+
+        for index, word in enumerate(words):
+            if start <= index <= end:
+                completed[lang].append(str(word['_id']))
+
+    response['completed'] = completed[lang]
+    print(completed)
+
+    db.status.update_one(
+        {"subject_id": full_id},
+        {"$set": {"completed": completed, }, }
+    )
+
+    print(db.status.find_one({"subject_id": full_id}))
+
+    return jsonify(response)
+
+
 @app.route('/api/v1.0/register', methods=['POST'])
 def register_student():
     subjects = db["subjects"]
