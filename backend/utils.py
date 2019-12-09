@@ -41,3 +41,24 @@ def recognize_word(id, lang):
                 })
 
     return response
+
+
+def delete_subject(db, name):
+    sub = db.subjects.find_one({'first_name': name})
+    print(sub)
+    db.subjects.delete_one({'first_name': name})
+    db.status.delete_one({'subject_id': sub['_id']})
+
+
+def delete_completed_word(db, name, lang, word):
+    sub_id = db.subjects.find_one({'first_name': name})['_id']
+    word_id = db.words.find_one({'value': word})['_id']
+    completed = db.status.find_one({'subject_id': sub_id})['completed']
+    completed[lang] = list(filter(lambda x: x != str(word_id), completed[lang]))
+
+    print(completed)
+
+    db.status.update_one(
+        {'subject_id': sub_id},
+        {"$set": {'completed': completed}, }
+    )
