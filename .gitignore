@@ -3,6 +3,7 @@ db/
 
 # python
 __pycache__/
+.ipynb_checkpoints/*
 
 # dependencies
 env/
